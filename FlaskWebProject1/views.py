@@ -4,7 +4,9 @@ Routes and views for the flask application.
 
 from datetime import datetime
 from flask import render_template
+from flask.json import jsonify
 from FlaskWebProject1 import app
+from FlaskWebProject1.db.database import mydb
 
 @app.route('/')
 @app.route('/home')
@@ -34,4 +36,19 @@ def about():
         title='About',
         year=datetime.now().year,
         message='Your application description page.'
+    )
+
+
+@app.route('/time')
+def time():
+    """ Connect to database and get the time"""
+    mycursor = mydb.cursor()
+
+    mycursor.execute("SELECT CURRENT_TIMESTAMP();")
+
+    myresult = mycursor.fetchone()
+    return jsonify(
+        time=myresult,
+        version="1.0.5",
+        today_class="the class is docker compose",
     )
