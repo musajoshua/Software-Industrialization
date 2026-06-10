@@ -19,10 +19,10 @@ services:
       retries: 20
       start_period: 30s
 
-  flaskapp:
-    image: docker.io/musajoshua/flaskapp:${FLASK_TAG}
+  flaskapp1:
+    image: docker.io/musajoshua/flaskapp:v1.0.14
     restart: always
-    container_name: flaskapp
+    container_name: flaskapp1
     environment:
       - DB_HOST=mysql
       - DB_PORT=3306
@@ -32,7 +32,24 @@ services:
       mysql:
         condition: service_healthy
     ports:
-      - "8000:8000"
+      - "8001:8000"
+    networks:
+      - my_new_network
+
+  flaskapp2:
+    image: docker.io/musajoshua/flaskapp:${FLASK_TAG}
+    restart: always
+    container_name: flaskapp2
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=root
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8002:8000"
     networks:
       - my_new_network
 

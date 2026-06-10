@@ -59,4 +59,5 @@ def version():
     """ Version """
     return jsonify(
         version="2.0",
+        instance="flask-app-2"
     )
