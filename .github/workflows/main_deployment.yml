@@ -11,6 +11,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}   # expose version to the deploy job
 
     steps:
       - name: Echo Name
@@ -59,3 +61,24 @@ jobs:
         with:
           push: true
           tags: musajoshua/flaskapp:${{ steps.version.outputs.version }}
+
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execute remote SSH commands using SSH key
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USERNAME }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            set -e
+            export FLASK_TAG=${{ needs.build.outputs.version }}
+            echo "Deploying musajoshua/flaskapp:${FLASK_TAG}"
+            cd ~/Software-Industrialization
+            git pull
+            podman pull docker.io/musajoshua/flaskapp:${FLASK_TAG}
+            podman-compose down
+            FLASK_TAG=${FLASK_TAG} podman-compose up -d
