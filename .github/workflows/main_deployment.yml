@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-    
+
   workflow_dispatch:
 
 
@@ -28,9 +28,34 @@ jobs:
           pip install -r requirements.txt
           python -m pip install flake8
 
+      - name: Compute next version from Docker Hub
+        id: version
+        run: |
+          IMAGE="musajoshua/flaskapp"
+          # List existing tags from Docker Hub (public repo => no auth needed)
+          TAGS=$(curl -s "https://hub.docker.com/v2/repositories/${IMAGE}/tags?page_size=100" | jq -r '.results[].name')
+          # Keep only vX.Y.Z tags and take the highest one
+          LATEST=$(echo "$TAGS" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1)
+          if [ -z "$LATEST" ]; then
+            NEXT="v1.0.0"           # no version tags yet -> start here
+          else
+            VERSION="${LATEST#v}"   # strip leading v for arithmetic
+            MAJOR=$(echo "$VERSION" | cut -d. -f1)
+            MINOR=$(echo "$VERSION" | cut -d. -f2)
+            PATCH=$(echo "$VERSION" | cut -d. -f3)
+            NEXT="v${MAJOR}.${MINOR}.$((PATCH + 1))"
+          fi
+          echo "Latest on Docker Hub: ${LATEST:-none} -> next: ${NEXT}"
+          echo "version=${NEXT}" >> "$GITHUB_OUTPUT"
+
       - name: Login to Docker
         uses: docker/login-action@v4
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PAT }}
-  
+
+      - name: Build and push
+        uses: docker/build-push-action@v7
+        with:
+          push: true
+          tags: musajoshua/flaskapp:${{ steps.version.outputs.version }}
