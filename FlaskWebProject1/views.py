@@ -58,6 +58,6 @@ def time():
 def version():
     """ Version """
     return jsonify(
-        version="2.0",
+        version="500",
         instance="flask-app-2"
     )
