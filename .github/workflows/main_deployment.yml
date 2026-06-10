@@ -75,10 +75,11 @@ jobs:
           key: ${{ secrets.VM_SSH_KEY }}
           script: |
             set -e
-            export FLASK_TAG=${{ needs.build.outputs.version }}
+            FLASK_TAG=${{ needs.build.outputs.version }}
             echo "Deploying musajoshua/flaskapp:${FLASK_TAG}"
             cd ~/Software-Industrialization
+            git checkout docker-compose.yml          # drop the previous deploy's sed edit so git pull is clean
             git pull
-            podman pull docker.io/musajoshua/flaskapp:${FLASK_TAG}
+            sed -i -E "s|(docker.io/musajoshua/flaskapp:).*|\1${FLASK_TAG}|" docker-compose.yml
             podman-compose down
-            FLASK_TAG=${FLASK_TAG} podman-compose up -d
+            podman-compose up -d
