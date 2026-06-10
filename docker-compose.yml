@@ -20,7 +20,7 @@ services:
       start_period: 30s
 
   flaskapp:
-    image: docker.io/musajoshua/flaskapp:v1.0.5
+    image: docker.io/musajoshua/flaskapp:v1.0.7
     restart: always
     container_name: flaskapp
     environment:

@@ -52,3 +52,11 @@ def time():
         version="1.0.5",
         today_class="the class is docker compose",
     )
+
+
+@app.route('/version')
+def version():
+    """ Version """
+    return jsonify(
+        version="1.0",
+    )
