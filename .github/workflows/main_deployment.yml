@@ -80,6 +80,6 @@ jobs:
             cd ~/Software-Industrialization
             git checkout docker-compose.yml          # drop the previous deploy's sed edit so git pull is clean
             git pull
-            sed -i -E "s|(docker.io/musajoshua/flaskapp:).*|\1${FLASK_TAG}|" docker-compose.yml
+            sed -i "s|flaskapp:\${FLASK_TAG}|flaskapp:${FLASK_TAG}|" docker-compose.yml
             podman-compose down
             podman-compose up -d
