@@ -1,0 +1,19 @@
+name: Build and deploy app to Azure Web app
+
+on:
+  push:
+    branches:
+      - main
+    
+  workflow_dispatch:
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Echo Name
+        run: |
+          echo "Hey Joshua"
+  
